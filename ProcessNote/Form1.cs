@@ -9,16 +9,22 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Collections;
 
 namespace ProcessNote
 {
     public partial class Form1 : Form
     {
         public Process[] Processes { get; set; }
+        List<String> myAL = new List<String>();
+        public Dictionary<Process, List<String>> ProcessComments { get; set; }
+        int counter = 0;
+
         public Form1()
         {
             InitializeComponent();
             Processes = Process.GetProcesses();
+            ProcessComments = new Dictionary<Process, List<String>>();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -55,8 +61,13 @@ namespace ProcessNote
 
             foreach (ProcessThread thread in process.Threads)
             {
+                listBox1.Items.Clear();
                 listBox1.Items.Add(thread.Id);
             }
+
+            fillComments(process);
+
+
         }
 
         private Process GetChoosenProcess()
@@ -72,6 +83,42 @@ namespace ProcessNote
                 }
             }
             return null;
+
+        }
+
+        private void Button1_Click(object sender, EventArgs e)
+        {
+            Process process = GetChoosenProcess();
+            if (textBox1.Text != null && process != null)
+            {
+                if (!ProcessComments.ContainsKey(process))
+                {
+                    myAL.Add(textBox1.Text);
+                    ProcessComments.Add(process, myAL);
+                }
+                else
+                {
+                    counter++;
+                    myAL.Add(textBox1.Text);
+                }
+            }
+            fillComments(process);
+
+        }
+
+        private void fillComments(Process process)
+        {
+            textBox2.Clear();
+            List<string> values = new List<string>();
+            if (ProcessComments.ContainsKey(process))
+            {
+                values = ProcessComments[process];
+            }
+
+            foreach (string comment in values)
+            {
+                textBox2.Text += System.Environment.NewLine + comment;
+            }
         }
     }
 }
