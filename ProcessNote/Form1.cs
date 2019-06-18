@@ -52,6 +52,11 @@ namespace ProcessNote
                 string[] row = new string[] { cpu + "%", ram + " MB", runningTime.ToString(), startTime.ToString() };
                 listView2.Items.Add(new ListViewItem(row));
             }
+
+            foreach (ProcessThread thread in process.Threads)
+            {
+                listBox1.Items.Add(thread.Id);
+            }
         }
 
         private Process GetChoosenProcess()
