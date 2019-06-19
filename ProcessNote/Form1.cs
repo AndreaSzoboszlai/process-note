@@ -16,8 +16,9 @@ namespace ProcessNote
     public partial class Form1 : Form
     {
         public Process[] Processes { get; set; }
-        List<String> myAL = new List<String>();
         public Dictionary<Process, List<String>> ProcessComments { get; set; }
+        public List<string> MyAL { get; set; }
+
         int counter = 0;
 
         public Form1()
@@ -54,24 +55,27 @@ namespace ProcessNote
 
                 DateTime startTime = process.StartTime;
                 TimeSpan runningTime = DateTime.Now - startTime;
-
+                //MessageBox.Show(process.Id.ToString());
                 string[] row = new string[] { cpu + "%", ram + " MB", runningTime.ToString(), startTime.ToString() };
                 listView2.Items.Add(new ListViewItem(row));
+
+                if (process.Threads != null)
+                {
+                    foreach (ProcessThread thread in process.Threads)
+                    {
+                        listBox1.Items.Clear();
+                        listBox1.Items.Add(thread.Id);
+                    }
+
+                    fillComments(process);
+                }
+
             }
-
-            foreach (ProcessThread thread in process.Threads)
-            {
-                listBox1.Items.Clear();
-                listBox1.Items.Add(thread.Id);
-            }
-
-            fillComments(process);
-
-
         }
 
         private Process GetChoosenProcess()
         {
+
             if (listView1.SelectedItems.Count > 0 && listView1.SelectedItems[0] != null)
             {
                 foreach (Process process in Processes)
@@ -93,16 +97,18 @@ namespace ProcessNote
             {
                 if (!ProcessComments.ContainsKey(process))
                 {
-                    myAL.Add(textBox1.Text);
-                    ProcessComments.Add(process, myAL);
+                    MyAL = new List<String>();
+                    MyAL.Add(textBox1.Text);
+                    ProcessComments.Add(process, MyAL);
                 }
                 else
                 {
-                    counter++;
-                    myAL.Add(textBox1.Text);
+
+                    ProcessComments[process].Add(textBox1.Text);
                 }
             }
             fillComments(process);
+            textBox1.Text = "";
 
         }
 
